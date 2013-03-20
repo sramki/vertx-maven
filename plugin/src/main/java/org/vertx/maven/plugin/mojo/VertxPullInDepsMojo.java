@@ -7,7 +7,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.vertx.java.platform.PlatformLocator;
 import org.vertx.java.platform.PlatformManager;
 
-@Mojo(name = "pullInDeps", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
+@Mojo(name = "pullindeps", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
 public class VertxPullInDepsMojo extends BaseVertxMojo {
 
     @Override
