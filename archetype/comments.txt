@@ -1,0 +1,188 @@
+Some comments:
+
+assembly/mod.xml:
+
+* Everything from src/main/resources should be included in jar, not just mod.json (Isn't that the default anyway?)
+
+* src/test/resources should not be included
+
+Tests:
+
+* GroovyIntegrationTests/JavaScriptIntegrationTests/PythonIntegrationTests/RubyIntegrationTests - the regexp seems to have been munged, e.g. 'filenameFilter=".+${symbol_escape}${symbol_escape}.groovy"
+
+This probably explains why only the JavaIntegrationTest is being run when I execute mvn test?
+
+* Test report - I can't see any html test report produced after running mvn test. Can we have something similar to what the Gradle build produces?
+
+* A system property should be used (vertx.moduleName) when deploying modules - this means the user doesn't have to hardcoded the module name in there which would make tests brittle like this:
+
+container.deployModule("maven:org.myorg:my-project:1.0-SNAPSHOT")
+
+* clean target doesn't delete the mods directory
+
+* The mod zip file produced has the wrong structure - it contains a mods/mod-name directory - this should not be there.
+
+* Where is the target to run the module? (i.e. equivalent of runMod target in Gradle build)
+
+* A lot of what is in pom.xml is just boilerplate - is it possible to separate this out into a separate file since it won't change - I'd rather see an approach like that (as we did in the Gradle template)
+
+* GroupId, module-directory and mods-directory seem to have the group id duplicated:
+
+<groupId>io.vertx</groupId>
+<module-directory>io.vertx.my-project-v1.0</module-directory>
+<mods-directory>maven:io.vertx:my-project:1.0-SNAPSHOT</mods-directory>
+
+* Typo <id>sonatypet</id>
+
+should be sonatype - Have you tried pushing to sonatype?
+
+* Pull in deps target is missing
+
+
+
+[20:09] <ramki> I'm not sure what you mean in this point:
+[20:09] <ramki> * GroupId, module-directory and mods-directory seem to have the group id duplicated: <groupId>io.vertx</groupId> <module-directory>io.vertx.my-project-v1.0</module-directory> <mods-directory>maven:io.vertx:my-project:1.0-SNAPSHOT</mods-directory>
+[20:10] <ramki> are you just saying, io.vertx is being repeated?
+[20:10] <purplefox> yes. it seems to me that io.vertx is a variable and it should only be defined once. e.g. in the gradle template it is defined in vertx.properties and the script just uses that
+[20:10] <purplefox> it seems pretty ugly to define it effectively in three places
+[20:11] <ramki> I don't think you can use something like a property file in maven. You can define the property within the pom file though.
+[20:11] <purplefox> dunno if this is possible in maven though! ;)
+[20:13] <purplefox> it seems to me much of the pom.xml is boilerplate and will never change across different modules
+[20:13] <ramki> Unfortunately, we have repeat those stuff because all those properties have different values. I can move the properties directly to the place where its being used though. Would you like that?
+[20:14] <ramki> yep, its all boilerplate. need to figure out if we can include other poms or move parts of it to someother place..
+[20:14] <purplefox> where is mods-directory and modules-directory actually used?
+[20:14] <ramki> module-directory is used for in the zip file. and mods-directory for the directory which is used by the test.
+[20:15] <ramki> when you unzip the mod, you will see the structure as in modules-directory.
+[20:16] <purplefox> isn't module-directory simply $groupID/$artifactID ?
+[20:16] <purplefox> it seems to me all these can be composed from standard propertues
+[20:16] <purplefox> so, instead of:
+[20:16] <purplefox> <outputDirectory>${module-directory}</outputDirectory>
+[20:16] <ramki> nope. it is ${groupId}.${artifactId}-v${version}
+[20:16] <purplefox> can't you do:
+[20:17] <purplefox> <outputDirectory>it is ${groupId}.${artifactId}-v${version}</outputDirectory>
+[20:17] <purplefox> the point i'm trying to make is, given some simple properties
+[20:17] <purplefox> $groupId
+[20:17] <purplefox> $artifactID
+[20:17] <ramki> yep. thats possible. Thats exactly what I was asking above 4 mins back.
+[20:17] <purplefox> $version
+[20:18] <purplefox> you then don't need to define any special properties and then there's no redundancy :)
+[20:18] <purplefox> ok so we're agreeing? ;)
+[20:19] <ramki> Ok. Will do that. That would effectively make all the outputdirectory exactly same but repeated 4 times within the assembler xml.
+[20:19] <purplefox> aren't artifact, group and version just standard properties available in a pom.xml? (i have no idea, but I would guess so)
+[20:19] <ramki> yep. they are standard variables.
+[20:20] <purplefox> the key point is it's bad if the user has to maintain "com.mycompany" in three places in a script
+[20:20] <ramki> the user doesn't have to touch it when using the archetype. It will all be auto generated.
+[20:20] <purplefox> it doesn't matter if the script contains ${groupId}.${artifactId}-v${version} in 3 places since the user will never need to edit it - it's boilerplate
+[20:21] <purplefox> ok i see, then not such an issue, but more a question of cleanliness i guess ;)
+[20:21] == gercan [~gorkem@212.253.219.9] has quit [Ping timeout: 255 seconds]
+[20:21] <ramki> Sure.  I understand. Will get it done that way.
+[20:22] <ramki> Next one: * Pull in deps target is missing
+[20:22] <ramki> you mean you want something like the gradle stuff where you do pullInDeps?
+[20:23] <purplefox> yes. basically some users like all the dependencies of their module pulled in and added as nested modules in their module so they have a completely self contained unit
+[20:23] <purplefox> (mainly maven users actually ;) )
+[20:23] <purplefox> that's what pullInDeps does
+[20:23] <purplefox> you just run it after you've created the module in the mods dir
+[20:23] <purplefox> and before you zip the module up
+[20:24] <purplefox> it should be optional
+[20:24] <ramki> :) me being maven user, thats the way it is. If you look at the mod.zip, it has all the dependencies with it but for io.vertx stuff..
+[20:24] <purplefox> and default to false
+[20:24] <purplefox> ramki: unless you call pullInDeps it won't necessarily have all the dependencies
+[20:24] <purplefox> ramki: it will only have the build time jar dependencies
+[20:25] == e_dub [~edub@c-68-52-42-167.hsd1.tn.comcast.net] has quit [Quit: Leaving]
+[20:26] <purplefox> for example:
+[20:26] <ramki> can you give me an example of pulled in dependency? Here is one I have in the zip file: mods/com.foo.bar.baz-v1.0.0/lib/jackson-core-asl-1.9.4.jar
+[20:26] <purplefox> no that's just a local jar dependency
+[20:26] <purplefox> ooh, btw you shouldn't have that either
+[20:26] <purplefox> let's come back to that in a minute
+[20:27] <purplefox> your module can contain any jars that it uses in the lib directory
+[20:27] == spiegela [~spiegela@131.107.200.34] has joined #vertx
+[20:27] <purplefox> that's what you've already got
+[20:27] <ramki> yep
+[20:27] <purplefox> but also modules can deploy other modules programmatically
+[20:27] <purplefox> and they include modules
+[20:27] <purplefox> and they can include other modules
+[20:27] <ramki> oh ok. you are talking vertx mods. Ok. Will have to figure out how to do that.
+[20:28] <purplefox> yes module dependencies
+[20:28] <purplefox> when you ask vert.x to deploy or include a module it looks in three places:
+[20:28] <purplefox> 1) inside a *nested* mods dir in the module itself
+[20:28] <purplefox> 2) in the local mods dir
+[20:28] <purplefox> 3) or VERTX_MODS if specified
+[20:29] <purplefox> now, some people like blalor_afk or bytor999 they like all the modules that are used by their module to be packaged up in the top module
+[20:29] <purplefox> so vert.x doesn't have to download and install them at runtime when they're first used
+[20:29] <purplefox> that's what pullInDeps does
+[20:29] <purplefox> it pulls in those module deps at _build time_
+[20:30] <purplefox> and puts them in a nested mods directory
+[20:30] <purplefox> so that by the time you build your module and deploy it it has everything it needs to run
+[20:30] <ramki> got it. the gradle build does that right? I will try and do the same.
+[20:30] <purplefox> yes the Gradle build does that
+[20:30] <ramki> next one: * A system property should be used (vertx.moduleName) when deploying modules - this means the user doesn't have to hardcoded the module name in there which would make tests brittle like this:  container.deployModule("maven:org.myorg:my-project:1.0-SNAPSHOT")
+[20:31] <purplefox> all you've got to do is (optionally) call pullInDeps after you've created it in the mods dir but before you've zipped it
+[20:31] <ramki> do you mean keeping that property in a property file external to pom?
+[20:31] == gercan [~gorkem@212.253.219.9] has joined #vertx
+[20:31] <ramki> Yep, I got the pullInDeps thing.
+[20:32] <ramki> had the next one pasted above.
+[20:32] <purplefox> Here's an example:
+[20:32] <purplefox> https://github.com/vert-x/vertx-gradle-template/blob/master/src/test/java/com/mycompany/myproject/test/integration/java/InContainerTest.java#L40
+[20:33] <purplefox> the test deploys a module, but we don't want to have to edit the test every time the version is changed to ensure the correct module is deployed
+[20:33] <purplefox> so using a system.property makes the tests less brittle and they'll continue to work when the version is incremented
+[20:33] <ramki> if it is at a system level, what happens if we are running multiple mods?
+[20:34] <purplefox> if you run the tests using the custom junit runner that the gradle template users then it looks for a file called vertx.properties
+[20:34] <purplefox> the system property just contains the name of the module that the build produces. a build only produces a single module
+[20:35] <purplefox> this is why, if you can get pom.xml to load its properties from a properties file (vertx.properties) this will all work much easier :)
+[20:36] <ramki> I like that idea but I seriously doubt if thats going to be possible in maven. will try
+[20:36] <purplefox> something like this: http://stackoverflow.com/questions/7144620/reading-properties-file-from-maven-pom-file
+[20:37] <purplefox> just guessing, i have no idea either ;)
+[20:37] <ramki> that seems like damn cool. Maven rocks! :)
+[20:37] <purplefox> no comment! ;)
+[20:38] <ramki> :)
+[20:38] <ramki> cool, so thats it I had for now. Will start fixing things now.
+[20:39] <ramki> thanks tim.
+[20:39] <purplefox> thank you!
+[20:39] <purplefox> i think you're almost there btw
+[20:40] <ramki> Now, I'm thinking so too. When I saw your message, it made me feel that I'm 30% complete! :)
+[20:41] == spiegela [~spiegela@131.107.200.34] has quit [Ping timeout: 252 seconds]
+[20:41] <purplefox> well, you seem to have the correct structure, the test run etc
+[20:42] <purplefox> which is more than froz3n, afaict
+[20:42] <purplefox> btw are you guys working together, or competing? ;)
+[20:43] <ramki> We want to work together but we are not able to get together. And yes, many places I'm thinking Froz3n is doing something thats already there in archetype.
+[20:44] <ramki> To my understanding, he just needs to do mvn  vertx:start|stop|run...
+[20:44] <purplefox> it seems to me that you are further down the road, so perhaps it might make more sense for frozen to help you with your archectype, then do something differemnt
+[20:44] == chirino [~chirino@71.180.128.149] has quit [Quit: Computer has gone to sleep.]
+[20:45] <purplefox> yep
+[20:45] <purplefox> i can't understand what all that code about starting/stopping servers is
+[20:45] <purplefox> it should just be a one-liner
+[20:45] <purplefox> platformManager.deployModule(...)
+[20:45] <ramki> Maven doesn't rock much here! :)
+[20:46] <purplefox> is it not possible to define a custom "action" in maven that runs some code?
+[20:46] <purplefox> i have no idea
+[20:46] <ramki> thats absolutely possible.
+[20:46] <ramki> I'm thinking he should have just plugged in the plugin part in the archetype and that would be it.
+[20:47] <purplefox> cool, so just define two "actions", one for pullInDeps and one for runModule and then call them at the appropraite points in the script?
+[20:47] <ramki> Thats basically it but you need to wire them in the plugin.
+[20:48] <purplefox> https://github.com/vert-x/vertx-gradle-template/blob/master/gradle/vertx.gradle#L130
+[20:48] <ramki> maven goes through different phases and you are allowed to plugin into any phase.
+[20:48] <ramki> If you want to know the life cycle its here: http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
+[20:50] <purplefox> maven is the lockin beast. it seems to me so many people have locked all their processes around the maven model that it would be inconceivable (and very expensive) for them to change. classic lockin problem. reminds of it departments who did the same with oracle
+[20:50] <purplefox> when a "better" way comes along they are screwed
+[20:51] <purplefox> i see, so "package" should also include pullInDeops
+[20:51] <ramki> I think its more the convenienece it provided when it came in but just adding some scriptablility into it would be way cool.
+[20:51] <ramki> yep
+[20:51] <purplefox> run doesn't really fit into any of those. is it not possible to define custom stages in maven?
+[20:52] <purplefox> run is just really when you want to play around with the running module. it's not really part of the build process
+[20:53] <ramki> You can use profiles for it and also has stuff like java:exec goals which you can morph into run I would think.
+[20:53] <ramki> will figure that out.
+[20:54] <purplefox> if maven supports stuff like executing arbitray java stuff then i guess it's possible
+[20:54] <purplefox> cool
+[20:54] <ramki> yep. thats possible.
+[20:55] <ramki> Should we suggest to Frozen what he should be doing?
+[20:55] <purplefox> anyways, thanks for your work on this, it is much appreciated
+[20:55] <purplefox> i think it would make more sense it he helped you, but of course he is free to do whatever he wants :)
+[20:55] <ramki> I'm building a big product on this and I can't thank you enough for this project. So mine is just miniscule stuff..
+[20:55] <purplefox> we could suggest it
+[20:56] <purplefox> np!
+[20:56] <ramki> cool.
+[20:56] <ramki> thanks for your time.
+[20:56] <purplefox> no probs. thanks for yours
+[20:57] <purplefox> gotta shoot for a bit
+
+
