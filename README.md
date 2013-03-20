@@ -6,8 +6,8 @@ Maven infrastructure for Vertx.
 * Contains
    * Maven Archetype for Vertx
    * Maven Plugin for Vertx
-     * Supports:
+     * Supports
        * runmod
        * pullInDeps
 
-#For Details refer inner directories.
+###For Details refer inner directories.
