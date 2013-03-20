@@ -10,4 +10,4 @@ Maven infrastructure for Vertx.
        * runmod
        * pullInDeps
 
-###For Details refer inner directories.
+###For more details refer inner directories.
