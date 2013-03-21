@@ -119,22 +119,6 @@
               </resources>
             </configuration>
           </execution>
-          <execution>
-            <id>site-css</id>
-            <phase>test</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>target/site</outputDirectory>
-              <overwrite>false</overwrite>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/site</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
