@@ -1,29 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
   <packaging>jar</packaging>
   <version>${version}</version>
   <name>Project - ${artifactId}</name>
   <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!--Vertx module name-->
+    <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
+
+    <!--Dependency versions-->
+    <vertx.version>2.0.0-SNAPSHOT</vertx.version>
+    <vertx.testtools.version>1.0.0-SNAPSHOT</vertx.testtools.version>
+    <junit.version>4.11</junit.version>
+
+    <!--Plugin versions-->
+    <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
+    <maven.resources.plugin.version>2.6</maven.resources.plugin.version>
+    <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
+    <maven.vertx.plugin.version>2.0.0-SNAPSHOT</maven.vertx.plugin.version>
+    <maven.surefire.plugin.version>2.14</maven.surefire.plugin.version>
+    <maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
+    <maven.surefire.report.plugin.version>2.14</maven.surefire.report.plugin.version>
+    <maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
+    <maven.dependency.plugin.version>2.7</maven.dependency.plugin.version>
+  </properties>
+
   <repositories>
     <repository>
-      <id>sonatype</id>
+      <id>sonatype-snapshots</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
   </repositories>
-  <properties>
-    <vertx.version>2.0.0-SNAPSHOT</vertx.version>
-    <vertx.testtools.version>1.0.0-SNAPSHOT</vertx.testtools.version>
-  </properties>
+
+  <dependencies>
+    <!--Vertx provided dependencies-->
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <version>${vertx.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-platform</artifactId>
+      <version>${vertx.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!--Test dependencies-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>testtools</artifactId>
+      <version>${vertx.testtools.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
+        <version>${maven.compiler.plugin.version}</version>
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
@@ -31,7 +82,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
+        <version>${maven.resources.plugin.version}</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -40,43 +91,13 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/mods/${project.groupId}~${project.artifactId}~${project.version}</outputDirectory>
+              <outputDirectory>
+                ${basedir}/mods/${module.name}
+              </outputDirectory>
               <overwrite>true</overwrite>
               <resources>
                 <resource>
                   <directory>target/classes</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-mods</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <overwrite>true</overwrite>
-              <outputDirectory>target/mods/${project.groupId}~${project.artifactId}~${project.version}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>target/classes</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>site-css</id>
-            <phase>test</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>target/site</outputDirectory>
-              <overwrite>false</overwrite>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/site</directory>
                 </resource>
               </resources>
             </configuration>
@@ -84,8 +105,26 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${maven.dependency.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>copy-mod-dependencies</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/mods/${module.name}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.5</version>
+        <version>${maven.clean.plugin.version}</version>
         <configuration>
           <filesets>
             <fileset>
@@ -97,12 +136,12 @@
       <plugin>
         <groupId>org.vertx.build.maven</groupId>
         <artifactId>vertx-maven-plugin</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>${maven.vertx.plugin.version}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.14</version>
+        <version>${maven.surefire.plugin.version}</version>
         <configuration>
           <includes>
             <include>**/*Test*.java</include>
@@ -112,7 +151,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.14</version>
+        <version>${maven.failsafe.plugin.version}</version>
         <configuration>
           <includes>
             <exclude>**/integration/**</exclude>
@@ -130,7 +169,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.14</version>
+        <version>${maven.surefire.report.plugin.version}</version>
         <executions>
           <execution>
             <id>generate-test-report</id>
@@ -167,36 +206,23 @@
       </plugin>
     </plugins>
   </build>
+
   <reporting>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.14</version>
+        <version>${maven.surefire.report.plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven.javadoc.plugin.version}</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-core</artifactId>
-      <version>${vertx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-platform</artifactId>
-      <version>${vertx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>testtools</artifactId>
-      <version>${vertx.testtools.version}</version>
-    </dependency>
-  </dependencies>
+
 </project>
