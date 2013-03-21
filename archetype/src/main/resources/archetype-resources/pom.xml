@@ -103,23 +103,6 @@
             </configuration>
           </execution>
           <execution>
-            <id>copy-mods</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <overwrite>true</overwrite>
-              <outputDirectory>target/mods/${module.name}
-              </outputDirectory>
-              <resources>
-                <resource>
-                  <directory>target/classes</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
             <id>site-css</id>
             <phase>test</phase>
             <goals>
