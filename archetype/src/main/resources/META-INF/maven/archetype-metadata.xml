@@ -42,6 +42,7 @@
     <fileSet filtered="true" encoding="UTF-8">
       <directory></directory>
       <includes>
+        <include>.gitignore</include>
         <include>README.md</include>
         <include>build-and-run.sh</include>
       </includes>
