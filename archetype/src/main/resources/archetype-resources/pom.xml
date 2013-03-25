@@ -58,7 +58,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -180,6 +180,14 @@
         <groupId>org.vertx.build.maven</groupId>
         <artifactId>vertx-maven-plugin</artifactId>
         <version>${maven.vertx.plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>pullindeps</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
