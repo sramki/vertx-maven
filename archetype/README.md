@@ -11,11 +11,11 @@ This archetype would help in setting up project structure for vertx module.
 # Creating a project using the Archetype
 
     mvn archetype:generate  -DarchetypeRepository=file:///tmp/mvn-repo/ \
-        -DarchetypeGroupId=org.vertx.build  -DarchetypeArtifactId=vertx-maven-archetype -DarchetypeVersion=2.0
+        -DarchetypeGroupId=org.vertx.build.maven  -DarchetypeArtifactId=vertx-maven-archetype -DarchetypeVersion=2.0
 
 # A sample foo.bar project
 
-    mvn archetype:generate  -DarchetypeRepository=file:///tmp/mvn-repo/ -DarchetypeGroupId=org.vertx.build  \
+    mvn archetype:generate  -DarchetypeRepository=file:///tmp/mvn-repo/ -DarchetypeGroupId=org.vertx.build.maven  \
     -DarchetypeArtifactId=vertx-maven-archetype -DarchetypeVersion=2.0 \ 
     -DgroupId=com.foo.bar -DartifactId=baz -Dversion=1.0 -Dlang=Java
 
