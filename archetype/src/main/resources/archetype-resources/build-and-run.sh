@@ -1,2 +1,2 @@
 mvn -q clean package
-vertx runmod ${module.name}
+vertx runmod ${groupId}~${artifactId}~${version}
