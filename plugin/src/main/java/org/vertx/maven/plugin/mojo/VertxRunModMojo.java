@@ -1,14 +1,16 @@
 package org.vertx.maven.plugin.mojo;
 
+import static java.lang.Long.MAX_VALUE;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
+import static org.vertx.java.platform.PlatformLocator.factory;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
-import org.vertx.java.platform.PlatformLocator;
 import org.vertx.java.platform.PlatformManager;
 
 /*
@@ -46,33 +48,35 @@ import org.vertx.java.platform.PlatformManager;
 @Mojo(name = "runmod", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
 public class VertxRunModMojo extends BaseVertxMojo {
 
-    @Override
-    public void execute() throws MojoExecutionException {
+	@Override
+	public void execute() throws MojoExecutionException {
 
-        args = getArgs();
-        args.add(0, VERTX_RUNMOD_COMMAND);
+		args = getArgs();
+		args.add(0, VERTX_RUNMOD_COMMAND);
 
-        try {
-            PlatformManager pm = PlatformLocator.factory
-                    .createPlatformManager();
-            final CountDownLatch latch = new CountDownLatch(1);
-            pm.deployModule(args.get(1), getConf(args), getInstances(args),
-                    new Handler<String>() {
-                        public void handle(String deploymentID) {
-                            if (deploymentID != null) {
-                                System.out.println("CTRL-C to stop server");
-                            } else {
-                                System.out
-                                        .println("Could not find the module. Did you forget to do mvn package?");
-                                // System.out
-                                // .println("Press CTRL-C to exit and do `mvn package`");
-                                latch.countDown();
-                            }
-                        }
-                    });
-            latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getMessage());
-        }
-    }
+		try {
+			final PlatformManager pm = factory.createPlatformManager();
+
+			final CountDownLatch latch = new CountDownLatch(1);
+
+			pm.deployModule(args.get(1), getConf(args), getInstances(args), new Handler<AsyncResult<String>>() {
+
+				@Override
+				public void handle(final AsyncResult<String> event) {
+					if (event.succeeded()) {
+						getLog().info("CTRL-C to stop server");
+					} else {
+						getLog().info("Could not find the module. Did you forget to do mvn package?");
+						latch.countDown();
+					}
+				}
+
+			});
+
+			latch.await(MAX_VALUE, MILLISECONDS);
+
+		} catch (final Exception e) {
+			throw new MojoExecutionException(e.getMessage());
+		}
+	}
 }
