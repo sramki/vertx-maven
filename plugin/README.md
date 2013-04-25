@@ -24,8 +24,14 @@ To start it, type:
 
 	mvn vertx:runmod
 
+You can of course, just use `vertx runmod` to run a module, but using the maven task doesn't require Vert.x to be pre-installed on
+your system and uses the versions of Vert.x declared in your pom.xml
+
 
 ### vertx:pullindeps
+
+Sometimes users want the transitive closure of all the modules that your module depends on to be included and packaged inside your module
+itself. This means that Vert.x won't need to download the modules at run-time when they are first used (which is default behaviour).
 
 Pulls in all module dependencies. Can be hooked to a maven phase in the pom file or called directly from the command line.
 To start it, type:
@@ -39,10 +45,6 @@ To start it, type:
 		<groupId>io.vertx</groupId>
 		<artifactId>vertx-maven-plugin</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
-		<configuration>
-			<moduleName>${project.groupId}~${project.artifactId}~${project.version}</moduleName> <!-- default -->
-			<vertxModulesDirectory>${basedir}/mods</vertxModulesDirectory> <!-- default -->
-		</configuration>
 	</plugin>  
 
 
@@ -50,22 +52,9 @@ Configuration Options
 ---------------------
 
 	<configuration>
-		<moduleName>${project.groupId}~${project.artifactId}~${project.version}</moduleName>
-		<vertxHomeDirectory>/path/to/vertx2</vertxHomeDirectory>
-		<vertxModulesDirectory>${basedir}/mods</vertxModulesDirectory>
-		<classpath>file:///extra/entries</classpath>
 		<configFile>/path/to/MyVerticle.conf</configFile>
 		<instances>1</instances>
-		<clusterHost>localhost</clusterHost>
-		<clusterPort>25500</clusterPort>
 	</configuration>
 
-Notice that by default, the vertxModulesDirectory property is set to "${basedir}/mods".
-* moduleName: The module to be executed.
-* vertxHomeDirectory: The directory where vertx2 is installed (not required). Set it to make use of the mods directory under vert.x 2.0 home.
-* vertxModulesDirectory: The directory where modules are to be installed. When set, this will be the mods directory to be used.
-* classpath: Extra entries for the classpath. Notice that maven artifacts will be included automatically in the classpath.
 * configFile: The config file to be used.
 * instances: The number of verticle instances.
-* clusterHost: The interface to be used for clustering.
-* clusterPort: The port number to be used for clustering (defaults to 25500).
