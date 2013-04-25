@@ -1,5 +1,4 @@
-package ${package}.integration.java;
-/*
+package ${package}.integration.java;/*
  * Copyright 2013 Red Hat, Inc.
  *
  * Red Hat licenses this file to you under the Apache License, version 2.0
@@ -17,13 +16,15 @@ package ${package}.integration.java;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-import static org.vertx.testtools.VertxAssert.*;
-
-import org.vertx.testtools.TestVerticle;
 import org.junit.Test;
+import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.testtools.TestVerticle;
+
+import static org.vertx.testtools.VertxAssert.*;
 
 /**
  * Example Java integration test
@@ -34,14 +35,15 @@ import org.vertx.java.core.http.HttpServerRequest;
  *
  * You can use the standard JUnit Assert API in your test by using the VertxAssert class
  */
-public class InContainerTest extends TestVerticle {
+public class ExampleIntegrationTest extends TestVerticle {
 
   @Test
   public void testDeployMod() {
-    container.deployModule(System.getProperty("vertx.modulename"), new Handler<String>() {
+    container.deployModule(System.getProperty("vertx.modulename"), new AsyncResultHandler<String>() {
       @Override
-      public void handle(String deploymentID) {
-        assertNotNull("deploymentID should not be null", deploymentID);
+      public void handle(AsyncResult<String> asyncResult) {
+        assertTrue(asyncResult.succeeded());
+        assertNotNull("deploymentID should not be null", asyncResult.result());
         testComplete();
       }
     });
@@ -51,13 +53,13 @@ public class InContainerTest extends TestVerticle {
   public void testHTTP() {
     vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
       public void handle(HttpServerRequest req) {
-        req.response.end();
+        req.response().end();
       }
     }).listen(8181);
     vertx.createHttpClient().setPort(8181).getNow("/",new Handler<HttpClientResponse>() {
       @Override
       public void handle(HttpClientResponse resp) {
-        assertEquals(200, resp.statusCode);
+        assertEquals(200, resp.statusCode());
         testComplete();
       }
     });

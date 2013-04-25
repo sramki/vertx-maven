@@ -1,4 +1,4 @@
-package  ${package}.integration.python;
+package ${package}.integration.python;
 /*
  * Copyright 2013 Red Hat, Inc.
  *

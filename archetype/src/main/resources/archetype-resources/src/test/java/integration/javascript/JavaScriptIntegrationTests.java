@@ -1,4 +1,4 @@
-package  ${package}.integration.javascript;
+package ${package}.integration.javascript;
 /*
  * Copyright 2013 Red Hat, Inc.
  *

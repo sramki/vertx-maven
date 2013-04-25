@@ -17,8 +17,8 @@ package ${package}.integration.java;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-import org.vertx.testtools.VertxAssert;
 import org.vertx.java.platform.Verticle;
+import org.vertx.testtools.VertxAssert;
 
 public class SomeVerticle extends Verticle {
 

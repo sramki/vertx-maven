@@ -1,4 +1,4 @@
-package  ${package}.integration.ruby;
+package ${package}.integration.ruby;
 /*
  * Copyright 2013 Red Hat, Inc.
  *
