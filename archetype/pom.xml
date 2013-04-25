@@ -3,12 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <groupId>io.vertx</groupId>
+    <artifactId>vert-maven-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>io.vertx</groupId>
   <artifactId>vertx-maven-archetype</artifactId>
   <version>2.0</version>
   <packaging>maven-archetype</packaging>
