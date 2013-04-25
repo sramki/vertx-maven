@@ -31,17 +31,6 @@ import static org.vertx.java.platform.PlatformLocator.factory;
  */
 
 /**
- * <p>
- * This goal is used to run a vert.x verticle in it's own instance.
- * </p>
- * q
- * <p>
- * The plugin forks a parallel lifecycle to ensure that the "package" phase has
- * been completed before invoking vert.x. This means that you do not need to
- * explicitly execute a "mvn package" first. It also means that a
- * "mvn clean vertx:run" will ensure that a full fresh compile and package is
- * done before invoking vert.x.
- * </p>
  *
  * @description Runs vert.x directly from a Maven project.
  */
