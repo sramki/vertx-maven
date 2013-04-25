@@ -37,13 +37,7 @@
     <maven.version>2.2.1</maven.version>
     <vertx.version>2.0.0-SNAPSHOT</vertx.version>
   </properties>
-  <repositories>
-    <repository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-  </repositories>
+
   <build>
     <plugins>
       <plugin>

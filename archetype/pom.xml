@@ -22,17 +22,6 @@
     </developer>
   </developers>
 
-  <!--properties>
-    <internal.repo.path>file:///tmp/mvn-repo/</internal.repo.path>
-  </properties>
-  <distributionManagement>
-    <repository>
-      <id>internal.repo</id>
-      <name>Internal Repository</name>
-      <url>${internal.repo.path}</url>
-    </repository>
-  </distributionManagement-->
-
   <build>
     <extensions>
       <extension>
@@ -52,5 +41,4 @@
     </pluginManagement>
   </build>
 
-  <url>http://maven.apache.org</url>
 </project>
