@@ -7,7 +7,7 @@ Install
 -----
 This version of the plugin is not yet available on Maven Central.
 
-Group ID: org.vertx.build.maven
+Group ID: io.vertx
 
 Artifact ID: vertx-maven-plugin
 
@@ -36,7 +36,7 @@ To start it, type:
 ##Example configuration:
 
 	<plugin>
-		<groupId>org.vertx.build.maven</groupId>
+		<groupId>io.vertx</groupId>
 		<artifactId>vertx-maven-plugin</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
 		<configuration>

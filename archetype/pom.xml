@@ -8,7 +8,7 @@
     <version>7</version>
   </parent>
 
-  <groupId>org.vertx.build.maven</groupId>
+  <groupId>io.vertx</groupId>
   <artifactId>vertx-maven-archetype</artifactId>
   <version>2.0</version>
   <packaging>maven-archetype</packaging>
