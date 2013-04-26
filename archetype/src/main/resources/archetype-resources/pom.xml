@@ -112,24 +112,6 @@
         <version>${maven.resources.plugin.version}</version>
         <executions>
           <execution>
-            <id>copy-mod-to-mods</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>
-                ${basedir}/mods/${module.name}
-              </outputDirectory>
-              <overwrite>true</overwrite>
-              <resources>
-                <resource>
-                  <directory>target/classes</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-mod-to-target</id>
             <phase>process-classes</phase>
             <goals>
@@ -169,17 +151,6 @@
         <version>${maven.dependency.plugin.version}</version>
         <executions>
           <execution>
-            <id>copy-mod-dependencies-to-mods</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/mods/${module.name}/lib</outputDirectory>
-              <includeScope>runtime</includeScope>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-mod-dependencies-to-target</id>
             <phase>process-classes</phase>
             <goals>
@@ -191,17 +162,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>${maven.clean.plugin.version}</version>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${basedir}/mods</directory>
-            </fileset>
-          </filesets>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -218,6 +178,12 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${maven.failsafe.plugin.version}</version>
         <configuration>
+          <systemProperties>
+            <property>
+              <name>vertx.mods</name>
+              <value>target/mods</value>
+            </property>
+          </systemProperties>
           <includes>
             <include>**/integration/**</include>
           </includes>
@@ -271,7 +237,6 @@
       </plugin>
     </plugins>
   </build>
-
   <reporting>
     <plugins>
       <plugin>
@@ -289,5 +254,4 @@
       </plugin>
     </plugins>
   </reporting>
-
 </project>
