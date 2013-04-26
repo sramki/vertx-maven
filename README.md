@@ -1,6 +1,3 @@
-#This repo is now moved to main vertx repo: https://github.com/vert-x/vertx-maven
-#Please use that repo.
-
 vertx-maven
 ===========
 
