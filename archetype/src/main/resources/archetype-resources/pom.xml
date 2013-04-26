@@ -209,7 +209,7 @@
         <version>${maven.surefire.plugin.version}</version>
         <configuration>
           <includes>
-            <include>**/*Test*.java</include>
+            <include>**/unit/*Test*.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -219,7 +219,7 @@
         <version>${maven.failsafe.plugin.version}</version>
         <configuration>
           <includes>
-            <exclude>**/integration/**</exclude>
+            <include>**/integration/**</include>
           </includes>
         </configuration>
         <executions>
