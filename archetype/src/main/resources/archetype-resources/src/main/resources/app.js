@@ -1,5 +1,3 @@
-load("vertx.js")
+var container = require("container");
+container.deployVerticle("${package}.MyVerticle");
 
-vertx.deployVerticle("${package}.MyVerticle")
-
-console.log("Deploying myverticle")
