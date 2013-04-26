@@ -14,12 +14,8 @@ function test_2() {
 }
 
 var script = this;
-container.deployModule(java.lang.System.getProperty("vertx.modulename"), null, 1, function(err, depID) {
-  if (err != null) {
-    err.printStackTrace();
-  }
-
-  vassert.assertTrue(err === null);
+container.deployModule(java.lang.System.getProperty("vertx.modulename"), function(err, depID) {
+  vassert.assertNull("err is not null", err);
   vertxTests.startTests(script);
 });
 
