@@ -19,6 +19,7 @@
     <!--Dependency versions-->
     <vertx.version>2.0.0-SNAPSHOT</vertx.version>
     <vertx.testtools.version>1.0.0-SNAPSHOT</vertx.testtools.version>
+    <vertx.pullindeps>false</vertx.pullindeps>
     <junit.version>4.11</junit.version>
 
     <!--Plugin versions-->
@@ -214,6 +215,20 @@
             <phase>integration-test</phase>
             <goals>
               <goal>failsafe-report-only</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>pullindeps</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>pullindeps</goal>
             </goals>
           </execution>
         </executions>
