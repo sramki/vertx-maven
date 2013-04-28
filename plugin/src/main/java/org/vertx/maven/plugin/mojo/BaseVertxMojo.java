@@ -16,7 +16,9 @@ package org.vertx.maven.plugin.mojo;
  * limitations under the License.
  */
 
-import static java.nio.file.Files.readAllBytes;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.vertx.java.core.json.JsonObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,8 @@ import java.net.URI;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.vertx.java.core.json.JsonObject;
+
+import static java.nio.file.Files.readAllBytes;
 
 public abstract class BaseVertxMojo extends AbstractMojo {
 
@@ -82,5 +86,5 @@ public abstract class BaseVertxMojo extends AbstractMojo {
 
         return null;
     }
-
 }
+

@@ -1,17 +1,17 @@
 package org.vertx.maven.plugin.mojo;
 
-import static java.lang.Long.MAX_VALUE;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
-import static org.vertx.java.platform.PlatformLocator.factory;
-
-import java.util.concurrent.CountDownLatch;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.platform.PlatformManager;
+
+import java.util.concurrent.CountDownLatch;
+
+import static java.lang.Long.MAX_VALUE;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
+import static org.vertx.java.platform.PlatformLocator.factory;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -32,6 +32,7 @@ import org.vertx.java.platform.PlatformManager;
 
 /**
  * 
+ *
  * @description Runs vert.x directly from a Maven project.
  */
 @Mojo(name = "runmod", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
