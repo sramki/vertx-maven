@@ -17,15 +17,27 @@ package ${package};
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.platform.Verticle;
 
-public class MyVerticle extends Verticle {
+/*
+This is a simple Java verticle which receives `ping` messages on the event bus and sends back `pong` replies
+ */
+public class PingVerticle extends Verticle {
 
   public void start() {
-    System.out.println("MyVerticle started");
-  }
 
-  public void stop() {
+
+    vertx.eventBus().registerHandler("ping-address", new Handler<Message<String>>() {
+      @Override
+      public void handle(Message<String> message) {
+        message.reply("pong!");
+        container.logger().info("Sent back pong");
+      }
+    });
+
+    container.logger().info("PingVerticle started");
 
   }
 }

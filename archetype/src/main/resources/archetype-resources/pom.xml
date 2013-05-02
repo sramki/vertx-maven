@@ -10,8 +10,19 @@
   <name>Project - ${artifactId}</name>
   <url>http://maven.apache.org</url>
 
+  <parent>
+     <groupId>org.sonatype.oss</groupId>
+     <artifactId>oss-parent</artifactId>
+     <version>7</version>
+  </parent>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Set pullindeps to true if you want any modules specified in the 'includes' and 'deploys' fields
+    in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
+    module won't download and install those dependencies at run-time when they're first requested. -->
+    <vertx.pullindeps>false</vertx.pullindeps>
 
     <!--Vertx module name-->
     <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
@@ -19,7 +30,6 @@
     <!--Dependency versions-->
     <vertx.version>2.0.0-SNAPSHOT</vertx.version>
     <vertx.testtools.version>1.0.0-SNAPSHOT</vertx.testtools.version>
-    <vertx.pullindeps>false</vertx.pullindeps>
     <junit.version>4.11</junit.version>
 
     <!--Plugin versions-->
