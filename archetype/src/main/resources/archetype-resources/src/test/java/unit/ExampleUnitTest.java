@@ -1,6 +1,6 @@
 package ${package}.unit;
 
-import ${package}.MyVerticle;
+import ${package}.PingVerticle;
 import org.junit.Test;
 
 /*
@@ -24,7 +24,7 @@ public class ExampleUnitTest {
 
   @Test
   public void testVerticle() {
-    MyVerticle vert = new MyVerticle();
+    PingVerticle vert = new PingVerticle();
 
     // do something with verticle
   }
