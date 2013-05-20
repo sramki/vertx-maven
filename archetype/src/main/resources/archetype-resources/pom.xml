@@ -106,6 +106,15 @@
            <instances>1</instances>
         </configuration>
         -->
+        <executions>
+          <execution>
+            <id>pullindeps</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>pullindeps</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Other plugins required by the build -->
@@ -209,20 +218,6 @@
             <phase>integration-test</phase>
             <goals>
               <goal>failsafe-report-only</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>pullindeps</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>pullindeps</goal>
             </goals>
           </execution>
         </executions>
