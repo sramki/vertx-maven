@@ -21,9 +21,6 @@ public class VertxPullInDepsMojo extends BaseVertxMojo {
   @Parameter(property = "vertx.pullindeps", defaultValue = "false")
   protected Boolean pullindeps;
 
-  @Parameter(property = "vertx.modsdir", defaultValue = "target/mods")
-  protected File modsdir;
-
   @Override
   public void execute() throws MojoExecutionException {
     try {
