@@ -10,7 +10,7 @@
 
   <groupId>io.vertx</groupId>
   <artifactId>vertx-maven-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0-beta1</version>
   <packaging>pom</packaging>
 
   <name>vertx-maven-parent</name>

@@ -11,8 +11,6 @@ Group ID: io.vertx
 
 Artifact ID: vertx-maven-plugin
 
-Current release version: 2.0.0-SNAPSHOT
-
 
 Usage
 -----
@@ -44,7 +42,7 @@ To start it, type:
 	<plugin>
 		<groupId>io.vertx</groupId>
 		<artifactId>vertx-maven-plugin</artifactId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>1.0.0-beta1</version>
 	</plugin>  
 
 
