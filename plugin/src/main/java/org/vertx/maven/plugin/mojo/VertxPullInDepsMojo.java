@@ -7,7 +7,6 @@ import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.platform.PlatformManager;
 
-import java.io.File;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.Long.MAX_VALUE;
@@ -15,17 +14,18 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 import static org.vertx.java.platform.PlatformLocator.factory;
 
-@Mojo(name = "pullindeps", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
+@Mojo(name = "pullInDeps", requiresProject = true, threadSafe = false, requiresDependencyResolution =
+    COMPILE_PLUS_RUNTIME)
 public class VertxPullInDepsMojo extends BaseVertxMojo {
 
-  @Parameter(property = "vertx.pullindeps", defaultValue = "false")
-  protected Boolean pullindeps;
+  @Parameter(property = "vertx.pullInDeps", defaultValue = "false")
+  protected Boolean pullInDeps;
 
   @Override
   public void execute() throws MojoExecutionException {
     try {
-      if (pullindeps) {
-        System.setProperty("vertx.mods", modsdir.getAbsolutePath());
+      if (pullInDeps) {
+        System.setProperty("vertx.mods", modsDir.getAbsolutePath());
         final PlatformManager pm = factory.createPlatformManager();
 
         final CountDownLatch latch = new CountDownLatch(1);

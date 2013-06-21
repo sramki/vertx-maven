@@ -2,6 +2,7 @@ package org.vertx.maven.plugin.mojo;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.platform.PlatformManager;
@@ -33,14 +34,16 @@ import static org.vertx.java.platform.PlatformLocator.factory;
 /**
  * @description Runs vert.x directly from a Maven project.
  */
-@Mojo(name = "runmod", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
+@Mojo(name = "runMod", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
 public class VertxRunModMojo extends BaseVertxMojo {
+
+
 
   @Override
   public void execute() throws MojoExecutionException {
 
     try {
-      System.setProperty("vertx.mods", modsdir.getAbsolutePath());
+      System.setProperty("vertx.mods", modsDir.getAbsolutePath());
       final PlatformManager pm = factory.createPlatformManager();
       final CountDownLatch latch = new CountDownLatch(1);
       pm.deployModule(moduleName, getConf(), instances,

@@ -18,6 +18,7 @@ package org.vertx.maven.plugin.mojo;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.vertx.java.core.json.JsonObject;
 
 import java.io.File;
@@ -28,12 +29,14 @@ import static java.nio.file.Files.readAllBytes;
 
 public abstract class BaseVertxMojo extends AbstractMojo {
 
+  protected MavenProject project;
+
   /**
    * The name of the module to run.
    * <p/>
    * If you're running a module, it's the name of the module to be run.
    */
-  @Parameter(property = "run.moduleName", defaultValue = "${project.groupId}~${project.artifactId}~${project.version}")
+  @Parameter(property = "moduleName", defaultValue = "${project.groupId}~${project.artifactId}~${project.version}")
   protected String moduleName;
 
   /**
@@ -48,21 +51,18 @@ public abstract class BaseVertxMojo extends AbstractMojo {
    * An example value would be src/main/resources/com/acme/MyVerticle.conf
    * </p>
    */
-  @Parameter(property = "run.configFile")
-  protected String configFile;
+  protected String configFile = null;
 
   /**
    * The number of instances of the verticle to instantiate in the vert.x
    * server. The default is 1.
    */
-  @Parameter(property = "run.instances", defaultValue = "1")
-  protected Integer instances;
+  protected Integer instances = 1;
 
   /**
    * The mods directory.  The default is relative path target/mods.
    */
-  @Parameter(property = "vertx.modsdir", defaultValue = "target/mods")
-  protected File modsdir;
+  protected File modsDir = new File("target/mods");
 
   protected JsonObject getConf() {
     JsonObject config = null;
