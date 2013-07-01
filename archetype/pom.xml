@@ -10,7 +10,7 @@
 
   <groupId>io.vertx</groupId>
   <artifactId>vertx-maven-archetype</artifactId>
-  <version>1.0.0-CR2-SNAPSHOT</version>
+  <version>1.0.0-CR2</version>
   <packaging>maven-archetype</packaging>
 
   <name>vertx-maven-archetype</name>

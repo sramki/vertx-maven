@@ -55,7 +55,7 @@ This will search for any archetypes in the `io.vertx` group and prompt you to ch
 This will search for any archetypes in the `io.vertx` group and prompt you to choose one.
 
    mvn archetype:generate  -DarchetypeRepository=file:///tmp/mvn-repo/ -DarchetypeGroupId=io.vertx \
-   -DarchetypeArtifactId=vertx-maven-archetype -DarchetypeVersion=2.0 \
+   -DarchetypeArtifactId=vertx-maven-archetype -DarchetypeVersion=1.0.0-CR2 \
    -DgroupId=com.foo.bar -DartifactId=baz -Dversion=1.0
 
 # Once your project is created
