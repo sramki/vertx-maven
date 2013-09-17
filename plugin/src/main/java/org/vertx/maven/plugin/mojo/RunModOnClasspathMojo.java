@@ -11,6 +11,7 @@ import org.vertx.java.platform.PlatformManager;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -65,10 +66,28 @@ public class RunModOnClasspathMojo extends BaseVertxMojo {
   }
 
   protected void doExecute(URL[] classpath) throws MojoExecutionException {
-
+    ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();
     try {
       System.setProperty("vertx.mods", modsDir.getAbsolutePath());
-      final PlatformManager pm = PlatformLocator.factory.createPlatformManager();
+
+      // We have to create another classloader which can load resources from src/main/resources so users
+      // can override the default repos.txt, langs.properties etc when running the module
+
+      // Seriously fuck Maven for forcing us to do this and now allowing users to configure directories
+      // to add to the classpath in pom.xml
+
+      URLClassLoader currentURLc = (URLClassLoader)getClass().getClassLoader();
+
+      URL[] urls = new URL[currentURLc.getURLs().length + 1];
+      urls[0] = new URL("file:src/main/resources/");
+      System.arraycopy(currentURLc.getURLs(), 0, urls, 1, currentURLc.getURLs().length);
+
+      URLClassLoader urlc = new URLClassLoader(urls, getClass().getClassLoader());
+
+      Thread.currentThread().setContextClassLoader(urlc);
+
+      PlatformManager pm = PlatformLocator.factory.createPlatformManager();
+
       final CountDownLatch latch = new CountDownLatch(1);
       pm.deployModuleFromClasspath(moduleName, getConf(), instances, classpath,
           new Handler<AsyncResult<String>>() {
@@ -90,6 +109,8 @@ public class RunModOnClasspathMojo extends BaseVertxMojo {
     } catch (final Exception e) {
       e.printStackTrace();
       throw new MojoExecutionException(e.getMessage());
+    } finally {
+      Thread.currentThread().setContextClassLoader(oldTCCL);
     }
   }
 }
