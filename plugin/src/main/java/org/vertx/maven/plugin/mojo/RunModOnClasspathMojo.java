@@ -96,10 +96,8 @@ public class RunModOnClasspathMojo extends BaseVertxMojo {
               if (event.succeeded()) {
                 getLog().info("CTRL-C to stop server");
               } else {
-                if (event.cause() != null) {
+                if (!event.succeeded()) {
                   getLog().error(event.cause());
-                } else {
-                  getLog().info("Could not find the module. Did you forget to do mvn package?");
                 }
                 latch.countDown();
               }

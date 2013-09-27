@@ -33,16 +33,10 @@ public class VertxPullInDepsMojo extends BaseVertxMojo {
             new Handler<AsyncResult<Void>>() {
               @Override
               public void handle(final AsyncResult<Void> event) {
-                if (event.succeeded()) {
-                  latch.countDown();
-                } else {
-                  if (event.cause() != null) {
-                    getLog().error(event.cause());
-                  } else {
-                    getLog().info("Cannot find the module. Did you forget to do mvn package?");
-                  }
-                  latch.countDown();
+                if (!event.succeeded()) {
+                  getLog().error(event.cause());
                 }
+                latch.countDown();
               }
             });
         latch.await(MAX_VALUE, MILLISECONDS);
