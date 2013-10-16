@@ -13,7 +13,7 @@
     <fileSets>
         <fileSet>
             <outputDirectory></outputDirectory>
-            <directory>target/mods/${module.name}</directory>
+            <directory>${mods.directory}/${module.name}</directory>
             <includes>
                 <include>**</include>
             </includes>
