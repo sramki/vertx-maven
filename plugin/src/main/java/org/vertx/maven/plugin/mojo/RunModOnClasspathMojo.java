@@ -48,6 +48,11 @@ public class RunModOnClasspathMojo extends BaseVertxMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
+    List<URL> urls = getConfiguredClasspath();
+    doExecute(urls.toArray(new URL[urls.size()]));
+  }
+
+  protected List<URL> getConfiguredClasspath() throws MojoExecutionException {
     List<URL> urls = new ArrayList<>();
     classpath = classpath.trim();
     if (!classpath.isEmpty()) {
@@ -61,8 +66,7 @@ public class RunModOnClasspathMojo extends BaseVertxMojo {
         }
       }
     }
-    URL[] urlArray = urls.isEmpty() ? null : urls.toArray(new URL[urls.size()]);
-    doExecute(urlArray);
+    return urls;
   }
 
   protected void doExecute(URL[] classpath) throws MojoExecutionException {

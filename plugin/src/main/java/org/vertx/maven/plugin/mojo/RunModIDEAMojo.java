@@ -27,6 +27,7 @@ import org.vertx.java.platform.PlatformManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.Long.MAX_VALUE;
@@ -42,9 +43,12 @@ public class RunModIDEAMojo extends RunModOnClasspathMojo {
   @Override
   public void execute() throws MojoExecutionException {
     try {
-      URL[] classpath = new URL[]{ new URL("file:src/main/resources/"), new URL("file:src/test/resources/"),
-          new URL("file:target/classes/"), new URL("file:target/test-classes/") };
-      doExecute(classpath);
+      List<URL> urls = getConfiguredClasspath();
+      urls.add(new URL("file:src/main/resources/"));
+      urls.add(new URL("file:src/test/resources/"));
+      urls.add(new URL("file:target/classes/"));
+      urls.add(new URL("file:target/test-classes/"));
+      doExecute(urls.toArray(new URL[urls.size()]));
     } catch (MalformedURLException e) {
       throw new RuntimeException("Failed to run " + e.getMessage());
     }
