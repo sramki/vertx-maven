@@ -59,7 +59,7 @@ public abstract class BaseVertxMojo extends AbstractMojo {
    * server. The default is 1.
    */
   @Parameter(defaultValue = "1")
-  protected Integer instances;
+  protected Integer instances = 1;
 
   /**
    * The mods directory.  The default is relative path target/mods.

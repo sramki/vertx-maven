@@ -40,7 +40,6 @@ public class VertxFatJarMojo extends BaseVertxMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
-    System.out.println("in fatjar task, createFatJar is " + createFatJar);
     try {
       if (createFatJar) {
         System.setProperty("vertx.mods", modsDir.getAbsolutePath());

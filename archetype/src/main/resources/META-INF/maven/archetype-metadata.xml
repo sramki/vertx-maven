@@ -44,7 +44,7 @@
       <includes>
         <include>.gitignore</include>
         <include>README.md</include>
-        <include>build-and-run.sh</include>
+        <include>vertx_classpath.txt</include>
       </includes>
     </fileSet>
     <fileSet filtered="true" encoding="UTF-8">

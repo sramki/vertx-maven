@@ -36,7 +36,7 @@
     <mods.directory>target/mods</mods.directory>
 
     <!--Dependency versions-->
-    <vertx.version>2.1M1</vertx.version>
+    <vertx.version>2.1M3-SNAPSHOT</vertx.version>
     <vertx.testtools.version>2.0.2-final</vertx.testtools.version>
     <junit.version>4.11</junit.version>
 
@@ -44,7 +44,7 @@
     <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
     <maven.resources.plugin.version>2.6</maven.resources.plugin.version>
     <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
-    <maven.vertx.plugin.version>2.0.1-final</maven.vertx.plugin.version>
+    <maven.vertx.plugin.version>2.0.2-SNAPSHOT</maven.vertx.plugin.version>
     <maven.surefire.plugin.version>2.14</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
     <maven.surefire.report.plugin.version>2.14</maven.surefire.report.plugin.version>
@@ -121,6 +121,24 @@
            <classpath>src/main/resources/:src/test/resources/:target/classes/:target/test-classes/</classpath>
         </configuration>
         -->
+        <!-- Make sure that the plugin uses the vert.x versions from this pom.xml not from its own pom.xml -->
+        <dependencies>
+          <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-platform</artifactId>
+            <version>${vertx.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-hazelcast</artifactId>
+            <version>${vertx.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>PullInDeps</id>

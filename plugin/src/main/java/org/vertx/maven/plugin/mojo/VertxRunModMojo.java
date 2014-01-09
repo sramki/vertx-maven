@@ -7,6 +7,7 @@ import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.platform.PlatformManager;
 
+import java.io.File;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.Long.MAX_VALUE;
@@ -37,29 +38,38 @@ import static org.vertx.java.platform.PlatformLocator.factory;
 @Mojo(name = "runMod", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
 public class VertxRunModMojo extends BaseVertxMojo {
 
-
-
   @Override
   public void execute() throws MojoExecutionException {
 
     try {
-      System.setProperty("vertx.mods", modsDir.getAbsolutePath());
+      String vertxMods = System.getenv("VERTX_MODS");
+      if (vertxMods != null) {
+        modsDir = new File(vertxMods);
+      }
+      System.setProperty("vertx.mods", modsDir.getCanonicalPath());
+
       final PlatformManager pm = factory.createPlatformManager();
+
       final CountDownLatch latch = new CountDownLatch(1);
-      pm.deployModule(moduleName, getConf(), instances,
-          new Handler<AsyncResult<String>>() {
-            @Override
-            public void handle(final AsyncResult<String> event) {
-              if (event.succeeded()) {
-                getLog().info("CTRL-C to stop server");
-              } else {
-                if (!event.succeeded()) {
-                  getLog().error(event.cause());
+      pm.createModuleLink(moduleName, new Handler<AsyncResult<Void>>() {
+        @Override
+        public void handle(AsyncResult<Void> asyncResult) {
+          pm.deployModule(moduleName, getConf(), instances,
+              new Handler<AsyncResult<String>>() {
+                @Override
+                public void handle(final AsyncResult<String> event) {
+                  if (event.succeeded()) {
+                    getLog().info("CTRL-C to stop server");
+                  } else {
+                    if (!event.succeeded()) {
+                      getLog().error(event.cause());
+                    }
+                    latch.countDown();
+                  }
                 }
-                latch.countDown();
-              }
-            }
-          });
+              });
+        }
+      });
       latch.await(MAX_VALUE, MILLISECONDS);
     } catch (final Exception e) {
       throw new MojoExecutionException(e.getMessage());
