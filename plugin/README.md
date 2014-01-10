@@ -15,6 +15,10 @@ Artifact ID: vertx-maven-plugin
 Usage
 -----
 
+### vertx:init
+
+Create a Vert.x module link
+
 ### vertx:runmod
 
 Deploys the current module and starts the module. The module will continue to run until the plugin is explicitly stopped with CTRL-C.  
