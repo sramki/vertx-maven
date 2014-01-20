@@ -46,6 +46,7 @@ public class VertxRunModMojo extends BaseVertxMojo {
   @Override
   public void execute() throws MojoExecutionException {
 
+    ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();
     try {
       String vertxMods = System.getenv("VERTX_MODS");
       if (vertxMods != null) {
@@ -60,52 +61,42 @@ public class VertxRunModMojo extends BaseVertxMojo {
       List<URL> urls = new ArrayList<>();
       addURLs(urls, "src/main/platform_lib");
       addURLs(urls, "src/main/resources/platform_lib");
-      final URL[] extraClasspath = urls.toArray(new URL[urls.size()]);
 
-      final PlatformManager pm = factory.createPlatformManager();
-
-      final CountDownLatch latch = new CountDownLatch(1);
-      pm.createModuleLink(moduleName, new Handler<AsyncResult<Void>>() {
-        @Override
-        public void handle(AsyncResult<Void> asyncResult) {
-          runMod(pm, extraClasspath, latch);
-        }
-      });
-      latch.await(MAX_VALUE, MILLISECONDS);
-    } catch (final Exception e) {
-      throw new MojoExecutionException(e.getMessage());
-    }
-  }
-
-  protected void runMod(PlatformManager pm, URL[] classpath, final CountDownLatch latch) {
-    ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();
-    try {
-      System.setProperty("vertx.mods", modsDir.getAbsolutePath());
+      ClassLoader loadFirstLoader = new LoadFirstClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
 
       // We have to create another classloader which can load resources from src/main/resources so users
       // can override the default repos.txt, langs.properties etc when running the module
+      // Can't figure out any way to this in Maven config!
 
-      // Seriously fuck Maven for forcing us to do this and now allowing users to configure directories
-      // to add to the classpath in pom.xml
+      Thread.currentThread().setContextClassLoader(loadFirstLoader);
 
-      URLClassLoader urlc = new URLClassLoader(classpath, getClass().getClassLoader());
+      final CountDownLatch latch = new CountDownLatch(1);
 
-      Thread.currentThread().setContextClassLoader(urlc);
+      final PlatformManager pm = factory.createPlatformManager();
 
-      pm.deployModule(moduleName, getConf(), instances,
-        new Handler<AsyncResult<String>>() {
-          @Override
-          public void handle(final AsyncResult<String> event) {
-            if (event.succeeded()) {
-              getLog().info("CTRL-C to stop server");
-            } else {
-              if (!event.succeeded()) {
-                getLog().error(event.cause());
-              }
-              latch.countDown();
-            }
-          }
-        });
+      pm.createModuleLink(moduleName, new Handler<AsyncResult<Void>>() {
+        @Override
+        public void handle(AsyncResult<Void> asyncResult) {
+          pm.deployModule(moduleName, getConf(), instances,
+              new Handler<AsyncResult<String>>() {
+                @Override
+                public void handle(final AsyncResult<String> event) {
+                  if (event.succeeded()) {
+                    getLog().info("CTRL-C to stop server");
+                  } else {
+                    if (!event.succeeded()) {
+                      getLog().error(event.cause());
+                    }
+                    latch.countDown();
+                  }
+                }
+              });
+        }
+      });
+
+      latch.await(MAX_VALUE, MILLISECONDS);
+    } catch (final Exception e) {
+      throw new MojoExecutionException(e.getMessage());
     } finally {
       Thread.currentThread().setContextClassLoader(oldTCCL);
     }
@@ -122,6 +113,35 @@ public class VertxRunModMojo extends BaseVertxMojo {
           if (path.endsWith(".jar") || path.endsWith(".zip")) {
             urls.add(file.getCanonicalFile().toURI().toURL());
           }
+        }
+      }
+    }
+  }
+
+  private static class LoadFirstClassLoader extends URLClassLoader {
+
+    private final ClassLoader parent;
+
+    private LoadFirstClassLoader(URL[] urls, ClassLoader parent) {
+      super(urls, parent);
+      this.parent = parent;
+    }
+
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      Class<?> c = findLoadedClass(name);
+      if (c != null) {
+        return c;
+      } else {
+        // Try and load with this first
+        try {
+          c = findClass(name);
+          if (resolve) {
+            resolveClass(c);
+          }
+          return c;
+        } catch (ClassNotFoundException e) {
+          return parent.loadClass(name);
         }
       }
     }
