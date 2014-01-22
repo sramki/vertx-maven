@@ -5,6 +5,5 @@
 # Feel free to edit it if you have a non standard project structure and put the resources of your
 # module elsewhere
 
-src/main/resources
 target/classes
-bin
+target/dependencies
