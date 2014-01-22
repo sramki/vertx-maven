@@ -2,12 +2,12 @@ package org.vertx.maven.plugin.mojo;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.platform.PlatformManager;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.Long.MAX_VALUE;
@@ -48,18 +48,32 @@ public class VertxInitMojo extends BaseVertxMojo {
       }
       System.setProperty("vertx.mods", modsDir.getCanonicalPath());
 
+      File cpFile = new File("vertx_classpath.txt");
+      if (!cpFile.exists()) {
+        cpFile.createNewFile();
+        String defaultCp = "src/main/resources\r\n" +
+                "target/classes\r\n" +
+                "bin\r\n";
+        try (FileWriter writer = new FileWriter(cpFile)) {
+          writer.write(defaultCp);
+        }
+      }
+
       final PlatformManager pm = factory.createPlatformManager();
 
       final CountDownLatch latch = new CountDownLatch(1);
       pm.createModuleLink(moduleName, new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> asyncResult) {
+          if (!asyncResult.succeeded()) {
+            getLog().info(asyncResult.cause().getMessage());
+          }
           latch.countDown();
         }
       });
       latch.await(MAX_VALUE, MILLISECONDS);
     } catch (final Exception e) {
-      throw new MojoExecutionException(e.getMessage());
+      throw new MojoExecutionException(e.getMessage(), e);
     }
   }
 }
