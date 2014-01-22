@@ -24,6 +24,10 @@ import org.vertx.java.core.json.JsonObject;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.nio.file.Files.readAllBytes;
 
@@ -90,6 +94,71 @@ public abstract class BaseVertxMojo extends AbstractMojo {
     }
 
     return null;
+  }
+
+  protected ClassLoader createClassLoader() throws Exception {
+    // We need to add some extra entries to the classpath so that any overrridden Vert.x platform config,
+    // e.g. cluster.xml, langs.properties etc can picked up when running the module
+    // Users can put such config either in a src/main/platform_lib directory (if they don't want it in the module)
+    // or in a src/main/resources/platform_lib directory (if they want it in the module, e.g. for fatjars)
+    List<URL> urls = new ArrayList<>();
+    addURLs(urls, "src/main/platform_lib");
+    addURLs(urls, "src/main/resources/platform_lib");
+
+    return new LoadFirstClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
+  }
+
+  protected void setVertxMods() throws Exception {
+    String vertxMods = System.getenv("VERTX_MODS");
+    if (vertxMods != null) {
+      modsDir = new File(vertxMods);
+    }
+    System.setProperty("vertx.mods", modsDir.getCanonicalPath());
+  }
+
+  private void addURLs(List<URL> urls, String dirName) throws IOException {
+    File dir = new File(dirName);
+    if (dir.exists()) {
+      urls.add(dir.getCanonicalFile().toURI().toURL());
+      File[] files = dir.listFiles();
+      if (files != null) {
+        for (File file: files) {
+          String path = file.getCanonicalPath();
+          if (path.endsWith(".jar") || path.endsWith(".zip")) {
+            urls.add(file.getCanonicalFile().toURI().toURL());
+          }
+        }
+      }
+    }
+  }
+
+  private static class LoadFirstClassLoader extends URLClassLoader {
+
+    private final ClassLoader parent;
+
+    private LoadFirstClassLoader(URL[] urls, ClassLoader parent) {
+      super(urls, parent);
+      this.parent = parent;
+    }
+
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      Class<?> c = findLoadedClass(name);
+      if (c != null) {
+        return c;
+      } else {
+        // Try and load with this first
+        try {
+          c = findClass(name);
+          if (resolve) {
+            resolveClass(c);
+          }
+          return c;
+        } catch (ClassNotFoundException e) {
+          return parent.loadClass(name);
+        }
+      }
+    }
   }
 }
 

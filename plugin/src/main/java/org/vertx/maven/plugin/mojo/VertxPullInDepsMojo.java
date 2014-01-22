@@ -23,26 +23,31 @@ public class VertxPullInDepsMojo extends BaseVertxMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
-    try {
-      if (pullInDeps) {
-        System.setProperty("vertx.mods", modsDir.getAbsolutePath());
-        final PlatformManager pm = factory.createPlatformManager();
+    if (pullInDeps) {
+      ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();
+      try {
+        setVertxMods();
+        Thread.currentThread().setContextClassLoader(createClassLoader());
+        PlatformManager pm = factory.createPlatformManager();
 
         final CountDownLatch latch = new CountDownLatch(1);
         pm.pullInDependencies(moduleName,
-            new Handler<AsyncResult<Void>>() {
-              @Override
-              public void handle(final AsyncResult<Void> event) {
-                if (!event.succeeded()) {
-                  getLog().error(event.cause());
-                }
-                latch.countDown();
+          new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(final AsyncResult<Void> event) {
+              if (!event.succeeded()) {
+                getLog().error(event.cause());
               }
-            });
+              latch.countDown();
+            }
+          });
         latch.await(MAX_VALUE, MILLISECONDS);
+
+      } catch (final Exception e) {
+        throw new MojoExecutionException(e.getMessage());
+      } finally {
+        Thread.currentThread().setContextClassLoader(oldTCCL);
       }
-    } catch (final Exception e) {
-      throw new MojoExecutionException(e.getMessage());
     }
   }
 }
