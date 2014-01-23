@@ -17,6 +17,7 @@ package org.vertx.maven.plugin.mojo;
  */
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.vertx.java.core.json.JsonObject;
@@ -33,6 +34,7 @@ import static java.nio.file.Files.readAllBytes;
 
 public abstract class BaseVertxMojo extends AbstractMojo {
 
+  @Component
   protected MavenProject project;
 
   /**

@@ -42,18 +42,14 @@ public class VertxInitMojo extends BaseVertxMojo {
   public void execute() throws MojoExecutionException {
 
     try {
-      String vertxMods = System.getenv("VERTX_MODS");
-      if (vertxMods != null) {
-        modsDir = new File(vertxMods);
-      }
-      System.setProperty("vertx.mods", modsDir.getCanonicalPath());
+      setVertxMods();
 
       File cpFile = new File("vertx_classpath.txt");
       if (!cpFile.exists()) {
         cpFile.createNewFile();
         String defaultCp = "src/main/resources\r\n" +
-                "target/classes\r\n" +
-                "bin\r\n";
+            "target/classes\r\n" +
+            "target/dependencies\r\n";
         try (FileWriter writer = new FileWriter(cpFile)) {
           writer.write(defaultCp);
         }
