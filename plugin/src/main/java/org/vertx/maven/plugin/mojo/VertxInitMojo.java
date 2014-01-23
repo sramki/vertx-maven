@@ -49,7 +49,8 @@ public class VertxInitMojo extends BaseVertxMojo {
         cpFile.createNewFile();
         String defaultCp = "src/main/resources\r\n" +
             "target/classes\r\n" +
-            "target/dependencies\r\n";
+            "target/dependencies\r\n" +
+            "bin\r\n";
         try (FileWriter writer = new FileWriter(cpFile)) {
           writer.write(defaultCp);
         }
