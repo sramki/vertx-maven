@@ -47,7 +47,7 @@ public class VertxRunModMojo extends BaseVertxMojo {
 
       final CountDownLatch latch = new CountDownLatch(1);
 
-      final PlatformManager pm = factory.createPlatformManager();
+      final PlatformManager pm = createPlatformManager();
 
       pm.createModuleLink(moduleName, new Handler<AsyncResult<Void>>() {
         @Override
