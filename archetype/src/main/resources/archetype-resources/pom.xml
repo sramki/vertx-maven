@@ -196,7 +196,7 @@
             </property>
           </systemProperties>
           <includes>
-            <include>**/integration/**</include>
+            <include>**/integration/**/*Test*</include>
           </includes>
         </configuration>
         <executions>
