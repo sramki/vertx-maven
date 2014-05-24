@@ -14,37 +14,40 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 import static org.vertx.java.platform.PlatformLocator.factory;
 
-@Mojo(name = "pullindeps", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
+@Mojo(name = "pullInDeps", requiresProject = true, threadSafe = false, requiresDependencyResolution =
+    COMPILE_PLUS_RUNTIME)
 public class VertxPullInDepsMojo extends BaseVertxMojo {
 
-  @Parameter(property = "vertx.pullindeps", defaultValue = "false")
-  protected Boolean pullindeps;
+  @Parameter(property = "vertx.pullInDeps", defaultValue = "false")
+  protected Boolean pullInDeps;
 
   @Override
   public void execute() throws MojoExecutionException {
-    try {
-      if (pullindeps) {
-        System.setProperty("vertx.mods", "target/mods");
-        final PlatformManager pm = factory.createPlatformManager();
+    if (pullInDeps) {
+      ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();
+      try {
+        setVertxMods();
+        Thread.currentThread().setContextClassLoader(createClassLoader());
+        PlatformManager pm = factory.createPlatformManager();
 
         final CountDownLatch latch = new CountDownLatch(1);
         pm.pullInDependencies(moduleName,
-            new Handler<AsyncResult<Void>>() {
-              @Override
-              public void handle(final AsyncResult<Void> event) {
-                if (event.succeeded()) {
-                  latch.countDown();
-                } else {
-                  getLog().info(
-                      "Cannot find the module. Did you forget to do mvn package?");
-                  latch.countDown();
-                }
+          new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(final AsyncResult<Void> event) {
+              if (!event.succeeded()) {
+                getLog().error(event.cause());
               }
-            });
+              latch.countDown();
+            }
+          });
         latch.await(MAX_VALUE, MILLISECONDS);
+
+      } catch (final Exception e) {
+        throw new MojoExecutionException(e.getMessage());
+      } finally {
+        Thread.currentThread().setContextClassLoader(oldTCCL);
       }
-    } catch (final Exception e) {
-      throw new MojoExecutionException(e.getMessage());
     }
   }
 }

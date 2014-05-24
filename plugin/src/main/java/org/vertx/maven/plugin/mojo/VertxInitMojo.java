@@ -6,6 +6,8 @@ import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.platform.PlatformManager;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.Long.MAX_VALUE;
@@ -31,52 +33,44 @@ import static org.vertx.java.platform.PlatformLocator.factory;
  */
 
 /**
- * @description Runs vert.x directly from a Maven project.
+ * @description Creates a module link for the module
  */
-@Mojo(name = "runMod", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
-public class VertxRunModMojo extends BaseVertxMojo {
+@Mojo(name = "init", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME)
+public class VertxInitMojo extends BaseVertxMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
 
-    ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();
     try {
       setVertxMods();
 
-      Thread.currentThread().setContextClassLoader(createClassLoader());
+      File cpFile = new File("vertx_classpath.txt");
+      if (!cpFile.exists()) {
+        cpFile.createNewFile();
+        String defaultCp = "src/main/resources\r\n" +
+            "target/classes\r\n" +
+            "target/dependencies\r\n" +
+            "bin\r\n";
+        try (FileWriter writer = new FileWriter(cpFile)) {
+          writer.write(defaultCp);
+        }
+      }
+
+      final PlatformManager pm = factory.createPlatformManager();
 
       final CountDownLatch latch = new CountDownLatch(1);
-
-      final PlatformManager pm = createPlatformManager();
-
       pm.createModuleLink(moduleName, new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> asyncResult) {
-          pm.deployModule(moduleName, getConf(), instances,
-              new Handler<AsyncResult<String>>() {
-                @Override
-                public void handle(final AsyncResult<String> event) {
-                  if (event.succeeded()) {
-                    getLog().info("CTRL-C to stop server");
-                  } else {
-                    if (!event.succeeded()) {
-                      getLog().error(event.cause());
-                    }
-                    latch.countDown();
-                  }
-                }
-              });
+          if (!asyncResult.succeeded()) {
+            getLog().info(asyncResult.cause().getMessage());
+          }
+          latch.countDown();
         }
       });
-
       latch.await(MAX_VALUE, MILLISECONDS);
     } catch (final Exception e) {
-      throw new MojoExecutionException(e.getMessage());
-    } finally {
-      Thread.currentThread().setContextClassLoader(oldTCCL);
+      throw new MojoExecutionException(e.getMessage(), e);
     }
   }
-
-
-
 }
